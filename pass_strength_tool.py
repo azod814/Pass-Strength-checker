@@ -1,16 +1,20 @@
 import re
-import getpass
 import time
 import hashlib
 import requests
 import random
 import string
+import os
 from colorama import Fore, Style, init
 
 # Initialize colorama
 init(autoreset=True)
 
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 def print_banner():
+    clear_screen()
     banner = f"""
 {Fore.RED}
                         ██╗   ██╗██████╗ ██╗
@@ -31,9 +35,7 @@ def print_banner():
             [+] Tool: Password Strength Checker
 {Fore.RESET}
     """
-    for line in banner.split('\n'):
-        print(line)
-        time.sleep(0.01)
+    print(banner)
 
 def is_password_leaked(password):
     try:
@@ -41,9 +43,7 @@ def is_password_leaked(password):
         prefix, suffix = hash[:5], hash[5:]
         url = f"https://api.pwnedpasswords.com/range/{prefix}"
         response = requests.get(url)
-        if suffix in response.text:
-            return True
-        return False
+        return suffix in response.text
     except:
         return False  # Offline mode
 
@@ -60,9 +60,8 @@ def estimate_brute_force_time(password):
         charset_size += 10
     if charset_size == 0:
         return "Instant"
-    # Estimated time in years (simplified)
     combinations = charset_size ** length
-    time_seconds = combinations / (10**12)  # 1 trillion guesses per second
+    time_seconds = combinations / (10**12)
     if time_seconds < 1:
         return "Instant"
     elif time_seconds < 60:
@@ -83,44 +82,30 @@ def generate_password(length=12):
 def check_strength(password):
     strength = 0
     suggestions = []
-
-    # Length check
     if len(password) >= 8:
         strength += 1
     else:
         suggestions.append("Make it longer (at least 8 characters).")
-
-    # Uppercase check
     if re.search(r'[A-Z]', password):
         strength += 1
     else:
         suggestions.append("Add uppercase letters (A-Z).")
-
-    # Lowercase check
     if re.search(r'[a-z]', password):
         strength += 1
     else:
         suggestions.append("Add lowercase letters (a-z).")
-
-    # Number check
     if re.search(r'[0-9]', password):
         strength += 1
     else:
         suggestions.append("Add numbers (0-9).")
-
-    # Special character check
     if re.search(r'[!@#$%^&*]', password):
         strength += 1
     else:
         suggestions.append("Add special characters (!@#$%^&*).")
-
-    # Common password check
     common_passwords = ["password", "123456", "qwerty", "letmein", "admin", "welcome"]
     if password.lower() in common_passwords:
         strength = 0
         suggestions.append("Avoid common passwords!")
-
-    # Strength level
     if strength <= 2:
         return "WEAK", suggestions
     elif strength <= 4:
@@ -145,7 +130,7 @@ def main():
         choice = input(f"\n{Fore.YELLOW}[>]{Fore.RESET} Enter your choice: ")
 
         if choice == "1":
-            password = getpass.getpass(f"{Fore.YELLOW}[>]{Fore.RESET} Enter password to check: ")
+            password = input(f"{Fore.YELLOW}[>]{Fore.RESET} Enter password to check: ")
             strength, suggestions = check_strength(password)
             percent = {"WEAK": 30, "MEDIUM": 70, "STRONG": 100}[strength]
             print_progress_bar(percent, strength)
@@ -157,13 +142,13 @@ def main():
                 print(f"{Fore.YELLOW}[+] Suggestions to improve:{Fore.RESET}")
                 for tip in suggestions:
                     print(f"   - {tip}")
-            time.sleep(2)
+            input(f"\n{Fore.YELLOW}[>]{Fore.RESET} Press Enter to continue...")
 
         elif choice == "2":
             length = int(input(f"{Fore.YELLOW}[>]{Fore.RESET} Enter password length (default 12): ") or 12)
             password = generate_password(length)
             print(f"\n{Fore.GREEN}[+] Generated Password: {password}{Fore.RESET}")
-            time.sleep(2)
+            input(f"\n{Fore.YELLOW}[>]{Fore.RESET} Press Enter to continue...")
 
         elif choice == "3":
             print(f"\n{Fore.RED}[!] Exiting...{Fore.RESET}")
