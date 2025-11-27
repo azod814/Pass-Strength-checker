@@ -7,7 +7,6 @@ import string
 import os
 from colorama import Fore, Style, init
 
-# Initialize colorama
 init(autoreset=True)
 
 def clear_screen():
@@ -32,7 +31,7 @@ def print_banner():
 ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝  ╚═╝
 {Fore.YELLOW}
             [+] Created by: azod814
-            [+] Tool: Password Strength Checker
+            [+] Tool: Password Strength Checker & Strengthener
 {Fore.RESET}
     """
     print(banner)
@@ -45,7 +44,7 @@ def is_password_leaked(password):
         response = requests.get(url)
         return suffix in response.text
     except:
-        return False  # Offline mode
+        return False
 
 def estimate_brute_force_time(password):
     length = len(password)
@@ -78,6 +77,31 @@ def estimate_brute_force_time(password):
 def generate_password(length=12):
     chars = string.ascii_letters + string.digits + "!@#$%^&*"
     return ''.join(random.choice(chars) for _ in range(length))
+
+def strengthen_password(password):
+    # Replace common letters with symbols/numbers
+    replacements = {
+        'a': '@', 'A': '4',
+        'e': '3', 'E': '€',
+        'i': '1', 'I': '!',
+        'o': '0', 'O': '*',
+        's': '$', 'S': '5',
+        't': '7', 'T': '+'
+    }
+    strengthened = []
+    for char in password:
+        if char in replacements:
+            strengthened.append(replacements[char])
+        else:
+            strengthened.append(char)
+    # Add random symbol/number if no special chars
+    if not re.search(r'[!@#$%^&*]', password):
+        strengthened.insert(random.randint(0, len(strengthened)), random.choice("!@#$%^&*"))
+    # Add random uppercase if none
+    if not re.search(r'[A-Z]', password):
+        idx = random.randint(0, len(strengthened)-1)
+        strengthened[idx] = strengthened[idx].upper()
+    return ''.join(strengthened)
 
 def check_strength(password):
     strength = 0
@@ -125,8 +149,9 @@ def main():
     while True:
         print(f"\n{Fore.CYAN}[+] Options:{Fore.RESET}")
         print(f"   {Fore.GREEN}1.{Fore.RESET} Check Password Strength")
-        print(f"   {Fore.GREEN}2.{Fore.RESET} Generate Strong Password")
-        print(f"   {Fore.GREEN}3.{Fore.RESET} Exit")
+        print(f"   {Fore.GREEN}2.{Fore.RESET} Strengthen My Password")
+        print(f"   {Fore.GREEN}3.{Fore.RESET} Generate Strong Password")
+        print(f"   {Fore.GREEN}4.{Fore.RESET} Exit")
         choice = input(f"\n{Fore.YELLOW}[>]{Fore.RESET} Enter your choice: ")
 
         if choice == "1":
@@ -145,12 +170,19 @@ def main():
             input(f"\n{Fore.YELLOW}[>]{Fore.RESET} Press Enter to continue...")
 
         elif choice == "2":
+            password = input(f"{Fore.YELLOW}[>]{Fore.RESET} Enter your password to strengthen: ")
+            strengthened = strengthen_password(password)
+            print(f"\n{Fore.GREEN}[+] Original Password: {password}{Fore.RESET}")
+            print(f"{Fore.GREEN}[+] Strengthened Password: {strengthened}{Fore.RESET}")
+            input(f"\n{Fore.YELLOW}[>]{Fore.RESET} Press Enter to continue...")
+
+        elif choice == "3":
             length = int(input(f"{Fore.YELLOW}[>]{Fore.RESET} Enter password length (default 12): ") or 12)
             password = generate_password(length)
             print(f"\n{Fore.GREEN}[+] Generated Password: {password}{Fore.RESET}")
             input(f"\n{Fore.YELLOW}[>]{Fore.RESET} Press Enter to continue...")
 
-        elif choice == "3":
+        elif choice == "4":
             print(f"\n{Fore.RED}[!] Exiting...{Fore.RESET}")
             break
 
@@ -159,4 +191,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
