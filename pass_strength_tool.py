@@ -31,7 +31,7 @@ def print_banner():
 ███████║   ██║   ██║  ██║███████╗██║ ╚████║╚██████╔╝  ██║   ██║  ██║
 ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝  ╚═╝
 {Fore.YELLOW}
-            [+] Created by: Nitro Dead
+            [+] Created by: azod814
             [+] Tool: Password Strength Checker
 {Fore.RESET}
     """
@@ -159,3 +159,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
